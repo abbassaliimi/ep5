@@ -23,13 +23,30 @@
         .basic-container {
             border: 1px solid #ccc;
             border-radius: 7px;
-            padding: 20px;
+            padding: 0px 20px 20px 20px;
             margin: 20px;
             background-color: #ffffff;
             width: 80vh;
+            max-height: 95vh;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column; 
+            justify-content: flex-start; 
+            position: relative;
         }
+
+        .header {
+            background-color: #fff;;
+            padding: 20px 0px 0px 0px;
+            font-weight: bold;
+            text-align: center;
+            position: sticky;
+            top: 0; 
+            z-index: 10; 
+        }
+
 
         #login-container img {
             width: 100px;
@@ -98,7 +115,6 @@
             padding: 10px 10px 0px 10px;
             margin-bottom: 10px;
             border-radius: 7px;
-            text-align: left;
         }
 
         .dropdown-container {
@@ -221,23 +237,23 @@
             const penggunaCont = document.getElementById('pengguna-container');
             const rkdPenggunaCont = document.getElementById('rekodPengguna-container');
 
-            // loginBtn.addEventListener('click', () => {
-            //     const form = loginBtn.closest('form');
-            //     if (!form.checkValidity()) { return; }
-            //     event.preventDefault();
+            loginBtn.addEventListener('click', () => {
+                const form = loginBtn.closest('form');
+                if (!form.checkValidity()) { return; }
+                event.preventDefault();
 
-            //     if (userTypeValue == 'Pengguna') {
-            //         penggunaCont.style.display = 'block';
-            //         loginCont.style.display = 'none';
-            //         rkdPenggunaCont.style.display = 'none';
+                if (userTypeValue == 'Pengguna') {
+                    penggunaCont.style.display = 'block';
+                    loginCont.style.display = 'none';
+                    rkdPenggunaCont.style.display = 'none';
 
-            //         document.getElementById('namaPengguna').value = ''; 
-            //         document.getElementById('kataLaluan').value = ''; 
-            //     }
-            // });
-            penggunaCont.style.display = 'block';
-            loginCont.style.display = 'none';
-            rkdPenggunaCont.style.display = 'none';
+                    document.getElementById('namaPengguna').value = ''; 
+                    document.getElementById('kataLaluan').value = ''; 
+                } 
+            });
+            // penggunaCont.style.display = 'block';
+            // loginCont.style.display = 'none';
+            // rkdPenggunaCont.style.display = 'none';
 
             populateTimeDropdowns();
 
@@ -245,13 +261,13 @@
                 loginCont.style.display = 'block';
                 penggunaCont.style.display = 'none';
                 rkdPenggunaCont.style.display = 'none';
-                //localStorage.clear();
+                localStorage.clear();
             });
             logoutBtn2.addEventListener('click', () => {
                 loginCont.style.display = 'block';
                 penggunaCont.style.display = 'none';
                 rkdPenggunaCont.style.display = 'none';
-                localStorage.clear();
+                //localStorage.clear();
             });
 
             hantarNotaBtn.addEventListener('click', () => {
@@ -280,6 +296,7 @@
                 populateTimeDropdowns();
                 document.getElementById('notaTugas').value = ''; 
 
+                alert(rekod);
                 alert("Rekod telah disimpan");
             });
 
@@ -288,26 +305,7 @@
                 penggunaCont.style.display = 'none';
                 loginCont.style.display = 'none';
 
-                const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
-                const rekodList = document.getElementById('rekodList');
-
-                rekodList.innerHTML = '';
-                rekods.reverse().forEach((rekod, index) => {
-                    const originalIndex = rekods.length - 1 - index;
-                    const li = document.createElement('li');
-                    let status = '';
-                    if (rekod.status == 'belum') {
-                        status = "<div class='belumDisemak'>Belum Disemak</div>";
-                    } else {
-                        status = "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
-                    }
-                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
-                    li.onclick = function() {
-                        semakNota(originalIndex);
-                    }
-                    rekodList.appendChild(li);
-                });
-
+                populateNota();
             });
 
             notabaruBtn.addEventListener('click', () => {
@@ -324,18 +322,43 @@
                 document.getElementById('kataLaluan2').value = ''; 
                 semakNotaBaru.style.display = 'none';
 
-                const rekodList = document.getElementById('rekodList');
-                rekodList.innerHTML = '';
-
                 const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
                 if (currentIndex >= 0 && currentIndex < rekods.length) {
                     rekods[currentIndex].status = 'disemak'; 
                 }
                 localStorage.setItem('rekodNota', JSON.stringify(rekods));
 
+                populateNota();
+
+                alert('Nota telah berjaya DISEMAK');
+                senaraiNota.style.display = 'block';
+                searchBar.style.display = 'block';
+                semakNotaBaru.style.display = 'none';
+            });
+
+            kembaliSenaraiNota.addEventListener('click', () => {
+                const semakNotaBaru = document.getElementById('semakNotaBaru');
+                const senaraiNota = document.getElementById('senaraiNota');
+                const searchBar = document.getElementById('searchBar');
+                senaraiNota.style.display = 'block';
+                searchBar.style.display = 'block';
+                semakNotaBaru.style.display = 'none';
+            });
+        });
+
+        function populateNota() {
+            const rekodList = document.getElementById('rekodList');
+            rekodList.innerHTML = '';
+
+            const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+            if (rekods.length === 0) {
+                let li = document.createElement('li');
+                li.innerHTML = "Tiada rekod";
+                rekodList.appendChild(li); 
+            } else {
                 rekods.reverse().forEach((rekod, index) => {
+                    let li = document.createElement('li');
                     const originalIndex = rekods.length - 1 - index;
-                    const li = document.createElement('li');
                     let status = '';
                     if (rekod.status == 'belum') {
                         status = "<div class='belumDisemak'>Belum Disemak</div>";
@@ -348,20 +371,8 @@
                     }
                     rekodList.appendChild(li);
                 });
-
-                alert('Nota telah berjaya DISEMAK');
-                senaraiNota.style.display = 'block';
-                semakNotaBaru.style.display = 'none';
-
-            });
-
-            kembaliSenaraiNota.addEventListener('click', () => {
-                const semakNotaBaru = document.getElementById('semakNotaBaru');
-                const senaraiNota = document.getElementById('senaraiNota');
-                senaraiNota.style.display = 'block';
-                semakNotaBaru.style.display = 'none';
-            });
-        });
+            }
+        }
 
         let currentIndex;
 
@@ -369,15 +380,23 @@
             currentIndex = index;
             const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
             const rekod = rekods[index];  
-            const notaPenuh = document.getElementById('notaPenuh');
-            notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}`;
-            
-            console.log('Record at index ' + index + ':', rekod);   
 
-            const semakNotaBaru = document.getElementById('semakNotaBaru');
-            const senaraiNota = document.getElementById('senaraiNota');
-            semakNotaBaru.style.display = 'block';
-            senaraiNota.style.display = 'none';
+            if (rekod.status == 'disemak') {
+                alert('Nota telah disemak');
+                return;
+            } else {
+                const notaPenuh = document.getElementById('notaPenuh');
+                notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}`;
+                
+                console.log('Record at index ' + index + ':', rekod);   
+
+                const semakNotaBaru = document.getElementById('semakNotaBaru');
+                const senaraiNota = document.getElementById('senaraiNota');
+                const searchBar = document.getElementById('searchBar');
+                semakNotaBaru.style.display = 'block';
+                searchBar.style.display = 'none';
+                senaraiNota.style.display = 'none';
+            }
         }
 
         function populateTimeDropdowns() {
@@ -416,9 +435,11 @@
 </head>
 <body>
     <div id="login-container" class="basic-container">
-        <!-- <img src="your-image.jpg" alt="Logo"> -->
-        <h2 style="color: #002060;">PDRM EP5</h2>
-        <p id="current-date" style="font-size: 1em; color: #002060; margin-top: -10px; margin-bottom: 20px;"></p>
+        <div style="padding-top: 20px;">
+            <!-- <img src="your-image.jpg" alt="Logo"> -->
+            <h2 style="color: #002060;">PDRM EP5</h2>
+            <p id="current-date" style="font-size: 1em; color: #002060; margin-top: -10px; margin-bottom: 20px;"></p>
+        </div>
         <form>
             <input id="namaPengguna" type="text" placeholder="Nama Pengguna" required oninvalid="this.setCustomValidity('Sila masukkan Nama Pengguna')" oninput="this.setCustomValidity('')">
             <input id="kataLaluan" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
@@ -431,15 +452,17 @@
     </div>
     <!-- --------------------------------- -->
     <div id="pengguna-container" style="display: none;" class="basic-container">
-        <div class="dblBtn-container">
-            <div class="dropdown">
-                <button id="rekodBtn" class="buttonGrey" type="submit">Rekod</button>
+        <div class="header">
+            <div class="dblBtn-container">
+                <div class="dropdown">
+                    <button id="rekodBtn" class="buttonGrey" type="submit">Rekod</button>
+                </div>
+                <div class="dropdown">
+                    <button id="logoutBtn" class="buttonRed" type="submit">Log Keluar</button>
+                </div>
             </div>
-            <div class="dropdown">
-                <button id="logoutBtn" class="buttonRed" type="submit">Log Keluar</button>
-            </div>
+            <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
         </div>
-        <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
         <p id="current-date2" style="font-size: 1em; color: #002060; margin-top: 10px; margin-bottom: 10px;"></p>
         <form>
             <div class="dropdown-container">
@@ -452,33 +475,38 @@
                     <select id="minute"></select>
                 </div>
             </div>
-            <textarea id="notaTugas" placeholder="Masukkan nota di sini" rows="5" required oninvalid="this.setCustomValidity('Sila masukkan nota tugas')" oninput="this.setCustomValidity('')" style="width: 100%; padding: 10px; margin-bottom: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 7px; font-family: Arial, sans-serif;"></textarea>
+            <textarea id="notaTugas" placeholder="Masukkan nota di sini" rows="5" required oninvalid="this.setCustomValidity('Sila masukkan nota tugas')" oninput="this.setCustomValidity('')" style="width: 100%; padding: 10px; margin-bottom: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 7px; font-family: Arial, sans-serif; font-size: 1em;"></textarea>
             <button id="hantarNotaBtn" class="buttonBlue" type="submit">Hantar</button>
         </form>
     </div>
     <!-- --------------------------------- -->
     <div id="rekodPengguna-container" style="display: none;" class="basic-container">
-        <div class="dblBtn-container">
-            <div class="dropdown">
-                <button id="notabaruBtn" class="buttonBlue" type="submit">Nota Baru</button>
+        <div class="header">
+            <div class="dblBtn-container">
+                <div class="dropdown">
+                    <button id="notabaruBtn" class="buttonBlue" type="submit">Nota Baru</button>
+                </div>
+                <div class="dropdown">
+                    <button id="logoutBtn2" class="buttonRed" type="submit">Log Keluar</button>
+                </div>
             </div>
-            <div class="dropdown">
-                <button id="logoutBtn2" class="buttonRed" type="submit">Log Keluar</button>
+            <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
+            <div id="searchBar">
+                <input type="text" placeholder="Carian">
+                <p style="font-size: 0.8em; color: #002060; padding-bottom: 10px; border-bottom: 1px solid #ccc;"><b>Tekan pada nota untuk membuat pengesahan</b></p>
             </div>
         </div>
-        <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
         <div id="semakNotaBaru" style="display: none;">
             <form>
                 <div class="subHeader"><b>Penyelia:</b> ASP G/16649 MOHD ADWAM BIN MAHAMUD</div>
-                <div id="notaPenuh"></div>
-                <p style="font-size: 0.8em;">Masukkan Kata Laluan untuk membuat pengesahan:</p>
+                <div id="notaPenuh" style="text-align: left;"></div>
+                <p style="font-size: 0.8em;">Masukkan Kata Laluan untuk membuat pengesahan</p>
                 <input id="kataLaluan2" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
                 <button id="disemakBtn" class="buttonGreen" type="submit"><b>DISEMAK</b></button>
                 <button id="kembaliSenaraiNota" class="buttonGreyBack" type="submit">Kembali</button>
             </form>
         </div>
         <div id="senaraiNota">
-            <input type="text" placeholder="Carian">
             <ul id="rekodList" class="styled-list"></ul>
         </div>
     </div>

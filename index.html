@@ -87,7 +87,7 @@
         }
 
         .buttonGreyBack {
-            background-color: #ccc;
+            background-color: #e1e1e1;
             color: #333;
             cursor: pointer;
             border: none;
@@ -104,7 +104,7 @@
         .buttonGreen {
             background-color: #4fdd83;
             color: #00511f;
-            border: none;
+            border: 3px solid #00511f;
             cursor: pointer;
             padding: 13px;
         }
@@ -226,49 +226,62 @@
             const loginBtn = document.getElementById('loginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
             const logoutBtn2 = document.getElementById('logoutBtn2');
+            const logoutBtn3 = document.getElementById('logoutBtn3');
             const rekodBtn = document.getElementById('rekodBtn');
             const notabaruBtn = document.getElementById('notabaruBtn');
             const disemakBtn = document.getElementById('disemakBtn');
             const kembaliSenaraiNota = document.getElementById('kembaliSenaraiNota');
 
-            const userTypeValue = document.getElementById('userType').value;
             const carianTextbox = document.getElementById('carianTextbox');
 
             const loginCont = document.getElementById('login-container');
             const penggunaCont = document.getElementById('pengguna-container');
             const rkdPenggunaCont = document.getElementById('rekodPengguna-container');
+            const penyeliaCont = document.getElementById('penyelia-container');
 
-            // loginBtn.addEventListener('click', () => {
-            //     const form = loginBtn.closest('form');
-            //     if (!form.checkValidity()) { return; }
-            //     event.preventDefault();
+            loginBtn.addEventListener('click', () => {
+                const userTypeValue = document.getElementById('userType').value;
+                const form = loginBtn.closest('form');
+                if (!form.checkValidity()) { return; }
+                event.preventDefault();
 
-            //     if (userTypeValue == 'Pengguna') {
-            //         penggunaCont.style.display = 'block';
-            //         loginCont.style.display = 'none';
-            //         rkdPenggunaCont.style.display = 'none';
+                if (userTypeValue == 'Pengguna') {
+                    penggunaCont.style.display = 'block';
+                    loginCont.style.display = 'none';
+                    rkdPenggunaCont.style.display = 'none';
+                } else {
+                    penyeliaCont.style.display = 'block';
+                    loginCont.style.display = 'none';
+                }
 
-            //         document.getElementById('namaPengguna').value = ''; 
-            //         document.getElementById('kataLaluan').value = ''; 
-            //     } 
-            // });
-            penggunaCont.style.display = 'block';
+                document.getElementById('namaPengguna').value = ''; 
+                document.getElementById('kataLaluan').value = ''; 
+            });
+            penyeliaCont.style.display = 'block';
             loginCont.style.display = 'none';
-            rkdPenggunaCont.style.display = 'none';
 
             populateTimeDropdowns();
+
+            const cleartData = document.getElementById('cleartData');
+            cleartData.addEventListener('click', () => {
+                localStorage.clear();
+                alert("All data has been deleted");
+            });
 
             logoutBtn.addEventListener('click', () => {
                 loginCont.style.display = 'block';
                 penggunaCont.style.display = 'none';
                 rkdPenggunaCont.style.display = 'none';
-                localStorage.clear();
             });
             logoutBtn2.addEventListener('click', () => {
                 loginCont.style.display = 'block';
                 penggunaCont.style.display = 'none';
                 rkdPenggunaCont.style.display = 'none';
-                //localStorage.clear();
+            });
+            logoutBtn3.addEventListener('click', () => {
+                loginCont.style.display = 'block';
+                penyeliaCont.style.display = 'none';
+                //rkdPenyeliaCont.style.display = 'none';
             });
 
             hantarNotaBtn.addEventListener('click', () => {
@@ -449,7 +462,7 @@
                 });
 
                 const notaPenuh = document.getElementById('notaPenuh');
-                notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa sebenar data dimasukkan: ${formattedDateTime}</div>`;
+                notaPenuh.innerHTML = `<div style='margin-bottom:10px; font-size: 0.8em; text-decoration: underline;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa sebenar data dimasukkan: ${formattedDateTime}</div>`;
                 
                 console.log('Record at index ' + index + ':', rekod);   
 
@@ -499,12 +512,12 @@
 <body>
     <div id="login-container" class="basic-container">
         <div style="padding-top: 20px;">
-            <!-- <img src="your-image.jpg" alt="Logo"> -->
+            <img style="width:50%; height:auto;" src="PDRM_logo.png" alt="Logo">
             <h2 style="color: #002060;">PDRM EP5</h2>
             <p id="current-date" style="font-size: 1em; color: #002060; margin-top: -10px; margin-bottom: 20px;"></p>
         </div>
         <form>
-            <input id="namaPengguna" type="text" placeholder="Nama Pengguna" required oninvalid="this.setCustomValidity('Sila masukkan Nama Pengguna')" oninput="this.setCustomValidity('')">
+            <input id="namaPengguna" type="text" placeholder="ID" required oninvalid="this.setCustomValidity('Sila masukkan Nama Pengguna')" oninput="this.setCustomValidity('')">
             <input id="kataLaluan" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
             <select required id="userType">
                 <option value="Pengguna">Pengguna</option>
@@ -512,6 +525,8 @@
             </select>
             <button id="loginBtn" class="buttonBlue" type="submit">Log Masuk</button>
         </form>
+        <br><br>
+        <div style="border-radius: 5px; font-size: 0.5em; padding:5px; background-color: #e1e1e1;" id="cleartData">[CLEAR ALL DATA] - For testing only</div>
     </div>
     <!-- --------------------------------- -->
     <div id="pengguna-container" style="display: none;" class="basic-container">
@@ -574,8 +589,18 @@
         </div>
     </div>
     <!-- --------------------------------- -->
-    <div id="Penyelia-container" style="display: none;"class="basic-container">
-        Penyelia
+    <div id="penyelia-container" style="display: none;"class="basic-container">
+        <div class="header">
+            <div class="dblBtn-container">
+                <div class="dropdown">
+                    <button id="rekodBtn2" class="buttonGrey" type="submit">Rekod</button>
+                </div>
+                <div class="dropdown">
+                    <button id="logoutBtn3" class="buttonRed" type="submit">Log Keluar</button>
+                </div>
+            </div>
+            <h3 style="color: #002060;">ASP G/16649 MOHD ADWAM BIN MAHAMUD</h3>
+        </div>
     </div>
 </body>
 </html>

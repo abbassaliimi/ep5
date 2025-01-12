@@ -252,13 +252,14 @@
                 } else {
                     penyeliaCont.style.display = 'block';
                     loginCont.style.display = 'none';
+                    populateNotaPenyelia('Belum Disemak');
                 }
 
                 document.getElementById('namaPengguna').value = ''; 
                 document.getElementById('kataLaluan').value = ''; 
             });
-            penyeliaCont.style.display = 'block';
-            loginCont.style.display = 'none';
+            // penyeliaCont.style.display = 'block';
+            // loginCont.style.display = 'none';
 
             populateTimeDropdowns();
 
@@ -300,7 +301,7 @@
                     tarikh: tarikh,
                     masa: masa,
                     nota: nota,
-                    status: 'belum'
+                    status: 'Belum Disemak'
                 };
 
                 const rekod = JSON.parse(localStorage.getItem('rekodNota')) || [];
@@ -338,7 +339,7 @@
 
                 const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
                 if (currentIndex >= 0 && currentIndex < rekods.length) {
-                    rekods[currentIndex].status = 'disemak'; 
+                    rekods[currentIndex].status = 'Disemak oleh: ASP G/16649'; 
                 }
                 localStorage.setItem('rekodNota', JSON.stringify(rekods));
 
@@ -385,7 +386,7 @@
 
             filteredRekods.reverse().forEach(rekod => {
                 const li = document.createElement('li');
-                let status = rekod.status === 'belum'
+                let status = rekod.status === 'Belum Disemak'
                     ? "<div class='belumDisemak'>Belum Disemak</div>"
                     : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
 
@@ -397,6 +398,54 @@
 
         function populateNota(keyword) {
             const rekodList = document.getElementById('rekodList');
+            rekodList.innerHTML = '';
+
+            let rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+
+            if (keyword != 'tiada') {
+                const filteredRekods = rekods.filter(rekod => {
+                    const searchString = `${rekod.tarikh} ${rekod.masa} ${rekod.nota} ${rekod.status}`.toLowerCase();
+                    console.log(searchString);
+                    return searchString.includes(keyword.toLowerCase());
+                });
+
+                rekods = filteredRekods;
+            } else { 
+                carianTextbox.value = ''; 
+            }
+    
+            if (rekods.length === 0) {
+                let li = document.createElement('li');
+                li.innerHTML = "Tiada rekod";
+                rekodList.appendChild(li); 
+            } else {
+                rekods.reverse().forEach((rekod, index) => {
+                    let li = document.createElement('li');
+                    const originalIndex = rekods.length - 1 - index;
+
+                    let status = rekod.status === 'Belum Disemak'
+                    ? "<div class='belumDisemak'>Belum Disemak</div>"
+                    : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+                    
+                    let logDatetime = rekod.logDatetime;
+                    let datetimeObj = new Date(logDatetime);
+                    const formattedDateTime = datetimeObj.toLocaleString('ms-MY', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false 
+                    });
+
+                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}<br><span style='font-size:0.5em;'>Masa ketika data dimasukkan: ${formattedDateTime}</span>`;
+                    li.onclick = function() {
+                        semakNota(originalIndex);
+                    }
+                    rekodList.appendChild(li);
+                });
+            }
+        }
+
+        function populateNotaPenyelia(keyword) {
+            const rekodList = document.getElementById('rekodListPenyelia');
             rekodList.innerHTML = '';
 
             let rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
@@ -419,9 +468,8 @@
             } else {
                 rekods.reverse().forEach((rekod, index) => {
                     let li = document.createElement('li');
-                    const originalIndex = rekods.length - 1 - index;
 
-                    let status = rekod.status === 'belum'
+                    let status = rekod.status === 'Belum Disemak'
                     ? "<div class='belumDisemak'>Belum Disemak</div>"
                     : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
                     
@@ -433,10 +481,7 @@
                         hour12: false 
                     });
 
-                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}<br><span style='font-size:0.5em;'>Masa sebenar data dimasukkan: ${formattedDateTime}</span>`;
-                    li.onclick = function() {
-                        semakNota(originalIndex);
-                    }
+                    li.innerHTML = `<div style="font-size:0.8em; padding-bottom:5px;">K/S 26375 AMMAR FAIZ BIN AZIZAN</div><div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}<br><span style='font-size:0.5em;'>Masa ketika data dimasukkan: ${formattedDateTime}</span>`;
                     rekodList.appendChild(li);
                 });
             }
@@ -449,7 +494,7 @@
             const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
             const rekod = rekods[index];  
 
-            if (rekod.status == 'disemak') {
+            if (rekod.status != 'Belum Disemak') {
                 alert('Nota telah disemak');
                 return;
             } else {
@@ -462,7 +507,7 @@
                 });
 
                 const notaPenuh = document.getElementById('notaPenuh');
-                notaPenuh.innerHTML = `<div style='margin-bottom:10px; font-size: 0.8em; text-decoration: underline;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa sebenar data dimasukkan: ${formattedDateTime}</div>`;
+                notaPenuh.innerHTML = `<div style='margin-bottom:10px; font-size: 0.8em; text-decoration: underline;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa ketika data dimasukkan: ${formattedDateTime}</div>`;
                 
                 console.log('Record at index ' + index + ':', rekod);   
 
@@ -591,15 +636,22 @@
     <!-- --------------------------------- -->
     <div id="penyelia-container" style="display: none;"class="basic-container">
         <div class="header">
-            <div class="dblBtn-container">
+            <!-- <div class="dblBtn-container">
                 <div class="dropdown">
                     <button id="rekodBtn2" class="buttonGrey" type="submit">Rekod</button>
                 </div>
                 <div class="dropdown">
                     <button id="logoutBtn3" class="buttonRed" type="submit">Log Keluar</button>
                 </div>
+            </div> -->
+            <div class="dropdown">
+                <button id="logoutBtn3" class="buttonRed" type="submit">Log Keluar</button>
             </div>
             <h3 style="color: #002060;">ASP G/16649 MOHD ADWAM BIN MAHAMUD</h3>
+        </div>
+        <p style="font-size: 0.8em; color: #002060; padding-bottom: 10px; border-bottom: 1px solid #ccc;"><b>Senarai rekod yang belum disahkan</b></p>
+        <div id="senaraiNotaPenyelia">
+            <ul id="rekodListPenyelia" class="styled-list"></ul>
         </div>
     </div>
 </body>

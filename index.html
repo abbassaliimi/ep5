@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDRM EP5</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .basic-container {
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            padding: 20px;
+            margin: 20px;
+            background-color: #ffffff;
+            width: 80vh;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #login-container img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        #login-container h2 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        input, 
+        select, 
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 1em;
+        }
+
+        .buttonBlue {
+            background-color: #002060;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .buttonGrey {
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .buttonRed {
+            background-color: #fff;
+            color: #ff0015;
+            cursor: pointer;
+            border: 2px solid #ff0015;
+            padding: 13px;
+        }
+
+        .buttonGreen {
+            background-color: #4fdd83;
+            color: #00511f;
+            border: none;
+            cursor: pointer;
+            padding: 13px;
+        }
+
+        #semakNotaBaru {
+            display: flex;
+            border: 2px solid #000;
+            padding: 10px 10px 0px 10px;
+            margin-bottom: 10px;
+            border-radius: 7px;
+            text-align: left;
+        }
+
+        .dropdown-container {
+            display: flex;
+            gap: 10px;
+            border: 2px solid #000;
+            padding: 10px;
+            border-radius: 7px;
+        }
+        .dropdown {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        select {
+            padding: 5px;
+            margin-top: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .dblBtn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .styled-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .styled-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .styled-list li:last-child {
+            border-bottom: none;
+        }
+
+        .styled-list li:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .styled-list li:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        .rekodHead {
+            font-weight: bold;
+            padding-bottom: 5px;
+        }
+
+        .belumDisemak {
+            display: inline-block;
+            background-color: #f8d7da;
+            color: #842029;
+            border-radius: 7px;
+            font-size: 0.8em;
+            padding: 5px 10px 5px 10px;
+            margin-top: 10px;
+        }
+
+        .sudahDisemak {
+            display: inline-block;
+            background-color: #4fdd83;
+            color: #00511f;
+            border-radius: 7px;
+            font-size: 0.8em;
+            padding: 5px 10px 5px 10px;
+            margin-top: 10px;
+        }
+        
+        .subHeader {
+            font-size: 0.9em;
+            padding-bottom: 10px;
+            color: #002060;
+        }
+
+        #notaPenuh {
+            padding: 15px;
+            background-color: #c8e5f8;
+            border-radius: 7px;
+            margin-bottom: 10px;
+        }
+          
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentDateElement = document.getElementById('current-date');
+            const currentDateElement2 = document.getElementById('current-date2');
+            const days = ['AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU'];
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('ms-MY', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const currentDay = days[today.getDay()];
+
+            currentDateElement.textContent = `${currentDay}, ${formattedDate}`;
+            currentDateElement2.textContent = `${currentDay}, ${formattedDate}`;
+
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutBtn2 = document.getElementById('logoutBtn2');
+            const rekodBtn = document.getElementById('rekodBtn');
+            const notabaruBtn = document.getElementById('notabaruBtn');
+            const disemakBtn = document.getElementById('disemakBtn');
+
+            const userTypeValue = document.getElementById('userType').value;
+
+            const loginCont = document.getElementById('login-container');
+            const penggunaCont = document.getElementById('pengguna-container');
+            const rkdPenggunaCont = document.getElementById('rekodPengguna-container');
+
+            // loginBtn.addEventListener('click', () => {
+            //     const form = loginBtn.closest('form');
+            //     if (!form.checkValidity()) { return; }
+            //     event.preventDefault();
+
+            //     if (userTypeValue == 'Pengguna') {
+            //         penggunaCont.style.display = 'block';
+            //         loginCont.style.display = 'none';
+            //         rkdPenggunaCont.style.display = 'none';
+
+            //         document.getElementById('namaPengguna').value = ''; 
+            //         document.getElementById('kataLaluan').value = ''; 
+            //     }
+            // });
+            penggunaCont.style.display = 'block';
+            loginCont.style.display = 'none';
+            rkdPenggunaCont.style.display = 'none';
+
+            populateTimeDropdowns();
+
+            logoutBtn.addEventListener('click', () => {
+                loginCont.style.display = 'block';
+                penggunaCont.style.display = 'none';
+                rkdPenggunaCont.style.display = 'none';
+                //localStorage.clear();
+            });
+            logoutBtn2.addEventListener('click', () => {
+                loginCont.style.display = 'block';
+                penggunaCont.style.display = 'none';
+                rkdPenggunaCont.style.display = 'none';
+                localStorage.clear();
+            });
+
+            hantarNotaBtn.addEventListener('click', () => {
+                const form = hantarNotaBtn.closest('form');
+                if (!form.checkValidity()) { return; }
+                event.preventDefault();
+
+                const actualDatetime = new Date();
+                const tarikh = document.getElementById('current-date2').textContent.trim();
+                const masa = document.getElementById('hour').value.trim() + ":" + document.getElementById('minute').value.trim();
+                const nota = document.getElementById('notaTugas').value.trim();
+
+                const newNota = {
+                    logDatetime: actualDatetime,
+                    tarikh: tarikh,
+                    masa: masa,
+                    nota: nota,
+                    status: 'belum'
+                };
+
+                const rekod = JSON.parse(localStorage.getItem('rekodNota')) || [];
+                rekod.push(newNota);
+                localStorage.setItem('rekodNota', JSON.stringify(rekod));
+
+                // Clear fields
+                populateTimeDropdowns();
+                document.getElementById('notaTugas').value = ''; 
+
+                alert("Rekod telah disimpan");
+            });
+
+            rekodBtn.addEventListener('click', () => {
+                rkdPenggunaCont.style.display = 'block';
+                penggunaCont.style.display = 'none';
+                loginCont.style.display = 'none';
+
+                const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+                const rekodList = document.getElementById('rekodList');
+
+                rekodList.innerHTML = '';
+                rekods.reverse().forEach((rekod, index) => {
+                    const originalIndex = rekods.length - 1 - index;
+                    const li = document.createElement('li');
+                    let status = '';
+                    if (rekod.status == 'belum') {
+                        status = "<div class='belumDisemak'>Belum Disemak</div>";
+                    } else {
+                        status = "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+                    }
+                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
+                    li.onclick = function() {
+                        semakNota(originalIndex);
+                    }
+                    rekodList.appendChild(li);
+                });
+
+            });
+
+            notabaruBtn.addEventListener('click', () => {
+                penggunaCont.style.display = 'block';
+                loginCont.style.display = 'none';
+                rkdPenggunaCont.style.display = 'none';
+            });
+
+            disemakBtn.addEventListener('click', () => {
+                const form = disemakBtn.closest('form');
+                if (!form.checkValidity()) { return; }
+                event.preventDefault();
+
+                document.getElementById('kataLaluan2').value = ''; 
+                semakNotaBaru.style.display = 'none';
+            });
+        });
+
+        function semakNota(index) {
+            const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+            const rekod = rekods[index];  
+            const notaPenuh = document.getElementById('notaPenuh');
+            notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}`;
+            
+            console.log('Record at index ' + index + ':', rekod);   
+
+            const semakNotaBaru = document.getElementById('semakNotaBaru');
+            semakNotaBaru.style.display = 'block';
+        }
+
+        function populateTimeDropdowns() {
+            const hourSelect = document.getElementById("hour");
+            const minuteSelect = document.getElementById("minute");
+            
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            // Populate hour dropdown (0-23)
+            for (let h = 0; h < 24; h++) {
+                const option = document.createElement("option");
+                option.value = h;
+                option.textContent = h.toString().padStart(2, "0");
+                if (h === currentHour) {
+                    option.selected = true;
+                }
+                hourSelect.appendChild(option);
+            }
+
+            // Populate minute dropdown (0-59)
+            for (let m = 0; m < 60; m++) {
+                const option = document.createElement("option");
+                option.value = m;
+                option.textContent = m.toString().padStart(2, "0");
+                if (m === currentMinute) {
+                    option.selected = true;
+                }
+                minuteSelect.appendChild(option);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="login-container" class="basic-container">
+        <!-- <img src="your-image.jpg" alt="Logo"> -->
+        <h2 style="color: #002060;">PDRM EP5</h2>
+        <p id="current-date" style="font-size: 1em; color: #002060; margin-top: -10px; margin-bottom: 20px;"></p>
+        <form>
+            <input id="namaPengguna" type="text" placeholder="Nama Pengguna" required oninvalid="this.setCustomValidity('Sila masukkan Nama Pengguna')" oninput="this.setCustomValidity('')">
+            <input id="kataLaluan" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
+            <select required id="userType">
+                <option value="Pengguna">Pengguna</option>
+                <option value="Penyelia">Penyelia</option>
+            </select>
+            <button id="loginBtn" class="buttonBlue" type="submit">Log Masuk</button>
+        </form>
+    </div>
+    <!-- --------------------------------- -->
+    <div id="pengguna-container" style="display: none;" class="basic-container">
+        <div class="dblBtn-container">
+            <div class="dropdown">
+                <button id="rekodBtn" class="buttonGrey" type="submit">Rekod</button>
+            </div>
+            <div class="dropdown">
+                <button id="logoutBtn" class="buttonRed" type="submit">Log Keluar</button>
+            </div>
+        </div>
+        <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
+        <p id="current-date2" style="font-size: 1em; color: #002060; margin-top: 10px; margin-bottom: 10px;"></p>
+        <form>
+            <div class="dropdown-container">
+                <div class="dropdown">
+                    <label for="hour">JAM</label>
+                    <select id="hour"></select>
+                </div>
+                <div class="dropdown">
+                    <label for="minute">MINIT</label>
+                    <select id="minute"></select>
+                </div>
+            </div>
+            <textarea id="notaTugas" placeholder="Masukkan nota di sini" rows="5" required oninvalid="this.setCustomValidity('Sila masukkan nota tugas')" oninput="this.setCustomValidity('')" style="width: 100%; padding: 10px; margin-bottom: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 7px; font-family: Arial, sans-serif;"></textarea>
+            <button id="hantarNotaBtn" class="buttonBlue" type="submit">Hantar</button>
+        </form>
+    </div>
+    <!-- --------------------------------- -->
+    <div id="rekodPengguna-container" style="display: none;" class="basic-container">
+        <div class="dblBtn-container">
+            <div class="dropdown">
+                <button id="notabaruBtn" class="buttonBlue" type="submit">Nota Baru</button>
+            </div>
+            <div class="dropdown">
+                <button id="logoutBtn2" class="buttonRed" type="submit">Log Keluar</button>
+            </div>
+        </div>
+        <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
+        <div id="semakNotaBaru" style="display: none;">
+            <form>
+                <div class="subHeader"><b>Penyelia:</b> ASP G/16649 MOHD ADWAM BIN MAHAMUD</div>
+                <div id="notaPenuh"></div>
+                <p style="font-size: 0.8em;">Masukkan Kata Laluan untuk membuat pengesahan:</p>
+                <input id="kataLaluan2" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
+                <button id="disemakBtn" class="buttonGreen" type="submit"><b>DISEMAK</b></button>
+            </form>
+        </div>
+        <input type="text" placeholder="Carian">
+        <ul id="rekodList" class="styled-list"></ul>
+    </div>
+    <!-- --------------------------------- -->
+    <div id="Penyelia-container" style="display: none;"class="basic-container">
+        Penyelia
+    </div>
+</body>
+</html>

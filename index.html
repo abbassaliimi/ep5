@@ -297,7 +297,6 @@
                 populateTimeDropdowns();
                 document.getElementById('notaTugas').value = ''; 
 
-                alert(rekod);
                 alert("Rekod telah disimpan");
             });
 
@@ -306,7 +305,7 @@
                 penggunaCont.style.display = 'none';
                 loginCont.style.display = 'none';
 
-                populateNota();
+                populateNota('tiada');
             });
 
             notabaruBtn.addEventListener('click', () => {
@@ -329,9 +328,10 @@
                 }
                 localStorage.setItem('rekodNota', JSON.stringify(rekods));
 
-                populateNota();
+                populateNota('tiada');
 
                 alert('Nota telah berjaya DISEMAK');
+                carianTextbox.value = '';
                 senaraiNota.style.display = 'block';
                 searchBar.style.display = 'block';
                 semakNotaBaru.style.display = 'none';
@@ -348,7 +348,7 @@
 
             carianTextbox.addEventListener('input', () => {
                 const keyword = carianTextbox.value;
-                carianList(keyword);
+                populateNota(keyword);
             });
         });
 
@@ -369,7 +369,7 @@
                 return;
             }
 
-            filteredRekods.forEach(rekod => {
+            filteredRekods.reverse().forEach(rekod => {
                 const li = document.createElement('li');
                 let status = rekod.status === 'belum'
                     ? "<div class='belumDisemak'>Belum Disemak</div>"
@@ -381,11 +381,23 @@
             });
         }
 
-        function populateNota() {
+        function populateNota(keyword) {
             const rekodList = document.getElementById('rekodList');
             rekodList.innerHTML = '';
 
-            const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+            let rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+
+            if (keyword != 'tiada') {
+                const filteredRekods = rekods.filter(rekod => {
+                    const searchString = `${rekod.tarikh} ${rekod.masa} ${rekod.nota} ${rekod.status}`.toLowerCase();
+                    return searchString.includes(keyword.toLowerCase());
+                });
+
+                rekods = filteredRekods;
+            } else { 
+                carianTextbox.value = ''; 
+            }
+    
             if (rekods.length === 0) {
                 let li = document.createElement('li');
                 li.innerHTML = "Tiada rekod";
@@ -394,11 +406,20 @@
                 rekods.reverse().forEach((rekod, index) => {
                     let li = document.createElement('li');
                     const originalIndex = rekods.length - 1 - index;
+
                     let status = rekod.status === 'belum'
                     ? "<div class='belumDisemak'>Belum Disemak</div>"
                     : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+                    
+                    let logDatetime = rekod.logDatetime;
+                    let datetimeObj = new Date(logDatetime);
+                    const formattedDateTime = datetimeObj.toLocaleString('ms-MY', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false 
+                    });
 
-                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
+                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}<br><span style='font-size:0.5em;'>Masa sebenar data dimasukkan: ${formattedDateTime}</span>`;
                     li.onclick = function() {
                         semakNota(originalIndex);
                     }
@@ -418,10 +439,18 @@
                 alert('Nota telah disemak');
                 return;
             } else {
+                let logDatetime = rekod.logDatetime;
+                let datetimeObj = new Date(logDatetime);
+                const formattedDateTime = datetimeObj.toLocaleString('ms-MY', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false 
+                });
+
                 const notaPenuh = document.getElementById('notaPenuh');
-                notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}`;
+                notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa sebenar data dimasukkan: ${formattedDateTime}</div>`;
                 
-                console.log('Record at index ' + index + ':', rekod);   
+                //console.log('Record at index ' + index + ':', rekod);   
 
                 const semakNotaBaru = document.getElementById('semakNotaBaru');
                 const senaraiNota = document.getElementById('senaraiNota');

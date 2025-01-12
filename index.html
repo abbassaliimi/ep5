@@ -69,6 +69,13 @@
             border: none;
         }
 
+        .buttonGreyBack {
+            background-color: #ccc;
+            color: #333;
+            cursor: pointer;
+            border: none;
+        }
+
         .buttonRed {
             background-color: #fff;
             color: #ff0015;
@@ -206,6 +213,7 @@
             const rekodBtn = document.getElementById('rekodBtn');
             const notabaruBtn = document.getElementById('notabaruBtn');
             const disemakBtn = document.getElementById('disemakBtn');
+            const kembaliSenaraiNota = document.getElementById('kembaliSenaraiNota');
 
             const userTypeValue = document.getElementById('userType').value;
 
@@ -315,10 +323,50 @@
 
                 document.getElementById('kataLaluan2').value = ''; 
                 semakNotaBaru.style.display = 'none';
+
+                const rekodList = document.getElementById('rekodList');
+                rekodList.innerHTML = '';
+
+                const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+                if (currentIndex >= 0 && currentIndex < rekods.length) {
+                    rekods[currentIndex].status = 'disemak'; 
+                }
+                localStorage.setItem('rekodNota', JSON.stringify(rekods));
+
+                rekods.reverse().forEach((rekod, index) => {
+                    const originalIndex = rekods.length - 1 - index;
+                    const li = document.createElement('li');
+                    let status = '';
+                    if (rekod.status == 'belum') {
+                        status = "<div class='belumDisemak'>Belum Disemak</div>";
+                    } else {
+                        status = "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+                    }
+                    li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
+                    li.onclick = function() {
+                        semakNota(originalIndex);
+                    }
+                    rekodList.appendChild(li);
+                });
+
+                alert('Nota telah berjaya DISEMAK');
+                senaraiNota.style.display = 'block';
+                semakNotaBaru.style.display = 'none';
+
+            });
+
+            kembaliSenaraiNota.addEventListener('click', () => {
+                const semakNotaBaru = document.getElementById('semakNotaBaru');
+                const senaraiNota = document.getElementById('senaraiNota');
+                senaraiNota.style.display = 'block';
+                semakNotaBaru.style.display = 'none';
             });
         });
 
+        let currentIndex;
+
         function semakNota(index) {
+            currentIndex = index;
             const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
             const rekod = rekods[index];  
             const notaPenuh = document.getElementById('notaPenuh');
@@ -327,12 +375,16 @@
             console.log('Record at index ' + index + ':', rekod);   
 
             const semakNotaBaru = document.getElementById('semakNotaBaru');
+            const senaraiNota = document.getElementById('senaraiNota');
             semakNotaBaru.style.display = 'block';
+            senaraiNota.style.display = 'none';
         }
 
         function populateTimeDropdowns() {
             const hourSelect = document.getElementById("hour");
             const minuteSelect = document.getElementById("minute");
+            hourSelect.innerHTML = '';
+            minuteSelect.innerHTML = '';
             
             const now = new Date();
             const currentHour = now.getHours();
@@ -422,10 +474,13 @@
                 <p style="font-size: 0.8em;">Masukkan Kata Laluan untuk membuat pengesahan:</p>
                 <input id="kataLaluan2" type="password" placeholder="Kata Laluan" required oninvalid="this.setCustomValidity('Sila masukkan Kata Laluan')" oninput="this.setCustomValidity('')">
                 <button id="disemakBtn" class="buttonGreen" type="submit"><b>DISEMAK</b></button>
+                <button id="kembaliSenaraiNota" class="buttonGreyBack" type="submit">Kembali</button>
             </form>
         </div>
-        <input type="text" placeholder="Carian">
-        <ul id="rekodList" class="styled-list"></ul>
+        <div id="senaraiNota">
+            <input type="text" placeholder="Carian">
+            <ul id="rekodList" class="styled-list"></ul>
+        </div>
     </div>
     <!-- --------------------------------- -->
     <div id="Penyelia-container" style="display: none;"class="basic-container">

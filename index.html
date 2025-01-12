@@ -278,7 +278,8 @@
 
                 const actualDatetime = new Date();
                 const tarikh = document.getElementById('current-date2').textContent.trim();
-                const masa = document.getElementById('hour').value.trim() + ":" + document.getElementById('minute').value.trim();
+                const minute = document.getElementById('minute').value.trim().padStart(2, "0"); // Ensure padding
+                const masa = document.getElementById('hour').value.trim() + ":" + minute;
                 const nota = document.getElementById('notaTugas').value.trim();
 
                 const newNota = {
@@ -450,7 +451,7 @@
                 const notaPenuh = document.getElementById('notaPenuh');
                 notaPenuh.innerHTML = `<div style='margin-bottom:5px; font-size: 0.8em;'><b>${rekod.tarikh}, ${rekod.masa}</b></div>${rekod.nota}<br><div style='font-size:0.8em; border-top:1px solid #fff; padding-top:10px; margin-top:10px;'>Masa sebenar data dimasukkan: ${formattedDateTime}</div>`;
                 
-                //console.log('Record at index ' + index + ':', rekod);   
+                console.log('Record at index ' + index + ':', rekod);   
 
                 const semakNotaBaru = document.getElementById('semakNotaBaru');
                 const senaraiNota = document.getElementById('senaraiNota');

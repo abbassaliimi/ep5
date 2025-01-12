@@ -232,28 +232,29 @@
             const kembaliSenaraiNota = document.getElementById('kembaliSenaraiNota');
 
             const userTypeValue = document.getElementById('userType').value;
+            const carianTextbox = document.getElementById('carianTextbox');
 
             const loginCont = document.getElementById('login-container');
             const penggunaCont = document.getElementById('pengguna-container');
             const rkdPenggunaCont = document.getElementById('rekodPengguna-container');
 
-            loginBtn.addEventListener('click', () => {
-                const form = loginBtn.closest('form');
-                if (!form.checkValidity()) { return; }
-                event.preventDefault();
+            // loginBtn.addEventListener('click', () => {
+            //     const form = loginBtn.closest('form');
+            //     if (!form.checkValidity()) { return; }
+            //     event.preventDefault();
 
-                if (userTypeValue == 'Pengguna') {
-                    penggunaCont.style.display = 'block';
-                    loginCont.style.display = 'none';
-                    rkdPenggunaCont.style.display = 'none';
+            //     if (userTypeValue == 'Pengguna') {
+            //         penggunaCont.style.display = 'block';
+            //         loginCont.style.display = 'none';
+            //         rkdPenggunaCont.style.display = 'none';
 
-                    document.getElementById('namaPengguna').value = ''; 
-                    document.getElementById('kataLaluan').value = ''; 
-                } 
-            });
-            // penggunaCont.style.display = 'block';
-            // loginCont.style.display = 'none';
-            // rkdPenggunaCont.style.display = 'none';
+            //         document.getElementById('namaPengguna').value = ''; 
+            //         document.getElementById('kataLaluan').value = ''; 
+            //     } 
+            // });
+            penggunaCont.style.display = 'block';
+            loginCont.style.display = 'none';
+            rkdPenggunaCont.style.display = 'none';
 
             populateTimeDropdowns();
 
@@ -344,7 +345,41 @@
                 searchBar.style.display = 'block';
                 semakNotaBaru.style.display = 'none';
             });
+
+            carianTextbox.addEventListener('input', () => {
+                const keyword = carianTextbox.value;
+                carianList(keyword);
+            });
         });
+
+        function carianList(filterKeyword = '') {
+            const rekodList = document.getElementById('rekodList');
+            rekodList.innerHTML = ''; 
+
+            const rekods = JSON.parse(localStorage.getItem('rekodNota')) || [];
+            const filteredRekods = rekods.filter(rekod => {
+                const searchString = `${rekod.tarikh} ${rekod.masa} ${rekod.nota} ${rekod.status}`.toLowerCase();
+                return searchString.includes(filterKeyword.toLowerCase());
+            });
+
+            if (filteredRekods.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Tiada rekod';
+                rekodList.appendChild(li);
+                return;
+            }
+
+            filteredRekods.forEach(rekod => {
+                const li = document.createElement('li');
+                let status = rekod.status === 'belum'
+                    ? "<div class='belumDisemak'>Belum Disemak</div>"
+                    : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+
+                li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div>
+                                <span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
+                rekodList.appendChild(li);
+            });
+        }
 
         function populateNota() {
             const rekodList = document.getElementById('rekodList');
@@ -359,12 +394,10 @@
                 rekods.reverse().forEach((rekod, index) => {
                     let li = document.createElement('li');
                     const originalIndex = rekods.length - 1 - index;
-                    let status = '';
-                    if (rekod.status == 'belum') {
-                        status = "<div class='belumDisemak'>Belum Disemak</div>";
-                    } else {
-                        status = "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
-                    }
+                    let status = rekod.status === 'belum'
+                    ? "<div class='belumDisemak'>Belum Disemak</div>"
+                    : "<div class='sudahDisemak'>Disemak oleh: ASP G/16649</div>";
+
                     li.innerHTML = `<div class='rekodHead'>${rekod.tarikh}, ${rekod.masa}</div><span style='font-size:0.8em;'>${rekod.nota}</span><br>${status}`;
                     li.onclick = function() {
                         semakNota(originalIndex);
@@ -492,7 +525,7 @@
             </div>
             <h3 style="color: #002060;">K/S 26375 AMMAR FAIZ BIN AZIZAN</h3>
             <div id="searchBar">
-                <input type="text" placeholder="Carian">
+                <input id="carianTextbox" type="text" placeholder="Carian">
                 <p style="font-size: 0.8em; color: #002060; padding-bottom: 10px; border-bottom: 1px solid #ccc;"><b>Tekan pada nota untuk membuat pengesahan</b></p>
             </div>
         </div>
